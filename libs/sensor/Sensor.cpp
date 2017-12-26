@@ -53,6 +53,8 @@ Sensor::Sensor(struct sensor_t const& hwSensor, const uuid_t& uuid, int halVersi
     mFlags = 0;
     mUuid = uuid;
     mRequiredPermission = "android.permission.OTHER_SENSORS";
+    AppOpsManager appOps;
+    mRequiredAppOp = appOps.permissionToOpCode(String16("android.permission.OTHER_SENSORS"));
 
     // Set fifo event count zero for older devices which do not support batching. Fused
     // sensors also have their fifo counts set to zero.
@@ -116,7 +118,6 @@ Sensor::Sensor(struct sensor_t const& hwSensor, const uuid_t& uuid, int halVersi
     case SENSOR_TYPE_HEART_RATE: {
         mStringType = SENSOR_STRING_TYPE_HEART_RATE;
         mRequiredPermission = SENSOR_PERMISSION_BODY_SENSORS;
-        AppOpsManager appOps;
         mRequiredAppOp = appOps.permissionToOpCode(String16(SENSOR_PERMISSION_BODY_SENSORS));
         mFlags |= SENSOR_FLAG_ON_CHANGE_MODE;
         } break;
@@ -262,7 +263,6 @@ Sensor::Sensor(struct sensor_t const& hwSensor, const uuid_t& uuid, int halVersi
         if (halVersion > SENSORS_DEVICE_API_VERSION_1_0 && hwSensor.requiredPermission) {
             mRequiredPermission = hwSensor.requiredPermission;
             if (!strcmp(mRequiredPermission, SENSOR_PERMISSION_BODY_SENSORS)) {
-                AppOpsManager appOps;
                 mRequiredAppOp = appOps.permissionToOpCode(String16(SENSOR_PERMISSION_BODY_SENSORS));
             }
         }
